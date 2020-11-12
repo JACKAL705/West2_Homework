@@ -2,6 +2,7 @@ package Interfaces;
 
 import Exceptions.IngredientSortOutException;
 import Exceptions.NotFoundSetMealException;
+import Exceptions.OverdraftBalanceException;
 import Ingredient.Drinks.Beer;
 import Ingredient.Drinks.Juice;
 import Ingredient.SetMeals.SetMeal;
@@ -28,6 +29,8 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
     }
     public West2FriedChickenRestaurant( double RestaurantBalance ){
         this.RestaurantBalance = RestaurantBalance;
+        BeerList = new LinkedList<>();
+        JuiceList = new LinkedList<>();
     }
     //————————————————————————————————————————————————————————————————————//
 
@@ -54,6 +57,7 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
         boolean FindDrink = false;
         if( BeerList != null ) for(Beer i:BeerList ){
             if( i.getName().equals(UsedBeer.getName()) && i.getAlcoholContent() == UsedBeer.getAlcoholContent()){
+                BeerList.remove( i );
                 FindDrink = true;
                 break;
             }
@@ -69,6 +73,7 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
         boolean FindDrink = false;
         if( JuiceList != null ) for(Juice i:JuiceList ){
             if( i.getName().equals(UsedJuice.getName())){
+                JuiceList.remove( i );
                 FindDrink = true;
                 break;
             }
@@ -93,19 +98,21 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
         }
         else{               //找到套餐
             boolean FindDrink = true;
-            RestaurantBalance += ChosenSetMeal.getPrice();
             try{
-                if( ChosenSetMeal.getDrink() instanceof Beer ){
+                if( ChosenSetMeal.getDrink() instanceof Beer ){     //饮料是啤酒
                     use( (Beer)ChosenSetMeal.getDrink() );
                 }
-                if( ChosenSetMeal.getDrink() instanceof Juice ){
+                if( ChosenSetMeal.getDrink() instanceof Juice ){    //饮料是果汁
                     use( (Juice)ChosenSetMeal.getDrink() );
                 }
             } catch ( IngredientSortOutException exception ){
                 FindDrink = false;
                 System.out.println("抱歉，" + exception.getMessage() + "已售完, 请另选其它套餐");
             }
-            if( FindDrink ) System.out.println( "选中" + NameOfSetMeal + ", 祝您用餐愉快!");
+            if( FindDrink ){
+                RestaurantBalance += ChosenSetMeal.getPrice();  //收银
+                System.out.println( "选中" + NameOfSetMeal + ", 祝您用餐愉快!");
+            }
         }
     }
     //————————————————————————————————————————————————————————————————————//
@@ -127,7 +134,132 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
     }
 
     @Override//批量进货
-    public void BulkPurchase() {
+    public void BulkPurchase() throws OverdraftBalanceException {
+        Scanner in = new Scanner( System.in );
+
+        while( true ){
+            System.out.println("--- 进货界面 ---");
+            System.out.println("1. 进货饮料");
+            System.out.println("2. 退出进货界面");
+            System.out.print("请输入要进行的操作序号: ");
+            switch ( in.nextInt() ){
+                case 1:{
+                    System.out.println("饮料种类选择：");
+                    System.out.println("1. 啤酒");
+                    System.out.println("2. 果汁");
+                    System.out.print("请输入要进货的种类: ");
+                    //啤酒：百威、青岛
+                    //果汁：橙汁、西瓜汁
+                    switch ( in.nextInt() ){
+                        case 1:{
+                            System.out.println("啤酒有以下几类：");
+                            System.out.println("1. 百威( 3.1%vol )");
+                            System.out.println("2. 青岛( 4.0%vol )");
+                            System.out.print("请输入要进货的种类、数量: ");
+                            int order = in.nextInt(), amount = in.nextInt();
+                            switch ( order ){
+                                case 1:{
+                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
+                                    else{
+                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                                    }
+                                    while( ( amount-- ) >0 ){
+                                        System.out.print("生产日期(年 月 日): ");
+                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
+                                        BeerList.add( new Beer( "百威", 6.0, ProductionDate, (float) 3.1 ) );
+                                    }
+                                    break;
+                                }
+                                case 2:{
+                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
+                                    else{
+                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                                    }
+                                    while( ( amount-- ) >0 ){
+                                        System.out.print("生产日期(年 月 日): ");
+                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
+                                        BeerList.add( new Beer( "青岛", 6.0, ProductionDate, (float) 4.0 ) );
+
+                                    }
+                                    break;
+                                }
+                                default:{
+                                    System.out.println("非法输入!");
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        case 2:{
+                            System.out.println("果汁有以下几类：");
+                            System.out.println("1. 橙汁");
+                            System.out.println("2. 西瓜汁");
+                            System.out.print("请输入要进货的种类、数量: ");
+                            int order = in.nextInt(), amount = in.nextInt();
+                            switch ( order ){
+                                case 1:{
+                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
+                                    else{
+                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                                    }
+                                    while( ( amount-- ) >0 ){
+                                        System.out.print("生产日期(年 月 日): ");
+                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
+                                        JuiceList.add( new Juice( "橙汁", 6.0, ProductionDate ) );
+                                    }
+                                    break;
+                                }
+                                case 2:{
+                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
+                                    else{
+                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                                    }
+                                    while( ( amount-- ) >0 ){
+                                        System.out.print("生产日期(年 月 日): ");
+                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
+                                        JuiceList.add( new Juice( "西瓜汁", 6.0, ProductionDate ) );
+                                    }
+                                    break;
+                                }
+                                default:{
+                                    System.out.println("非法输入!");
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                        default:{
+                            System.out.println("非法输入!");
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 2:{
+                    return;
+                }
+                default:{
+                    System.out.println("非法输入!");
+                    break;
+                }
+            }
+
+
+            System.out.print("继续进货请按1, 完成进货请按0: ");
+            switch ( in.nextInt() ){
+                case 0:{
+                    System.out.println("进货完毕!");
+                    return;
+                }
+                case 1:{
+                    break;
+                }
+                default:{
+                    System.out.println( "非法输入, 自动返回进货界面!" );
+                    break;
+                }
+            }
+        }
 
     }
 
@@ -140,6 +272,9 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
     }
     //————————————————————————————————————————————————————————————————————//
 
-    //啤酒：百威、科罗娜、青岛、喜力
-    //果汁：橙汁、西瓜汁、椰子汁
+    //————————————————————SET/GET函数————————————————————//
+    public double GetBalance(){
+        return RestaurantBalance;
+    }
+    //————————————————————————————————————————————————————————————————————//
 }

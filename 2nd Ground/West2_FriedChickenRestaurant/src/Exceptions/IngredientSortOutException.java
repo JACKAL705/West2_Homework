@@ -1,7 +1,7 @@
 package Exceptions;
 
 //果汁或啤酒售完
-public class IngredientSortOutException extends Throwable{
+public class IngredientSortOutException extends RuntimeException{
     public IngredientSortOutException(){
 
     }
