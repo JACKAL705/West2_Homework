@@ -1,9 +1,9 @@
 import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
 //命名解释：
 // AmountOfSection 分块的数量
 // NumberOfSection 分块的序号
 // LengthOfSection 每块的长度
+// n 总查找长度 (沿用题目的命名)
 // x 要查找的数字 (沿用题目的命名)
 public class Main {
     private static long n = 1000000000;
@@ -15,7 +15,7 @@ public class Main {
         return String.valueOf( num ).contains( String.valueOf( x ) );
     }
 
-//    private static volatile void AddToAns( long x ){
+//    private static synchronized void AddToAns( long x ){
 //        ans += x;
 //    }
     //synchronized很重要，否则答案错误，但是拖慢了时间
