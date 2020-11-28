@@ -4,6 +4,7 @@ import Exceptions.IngredientSortOutException;
 import Exceptions.NotFoundSetMealException;
 import Exceptions.OverdraftBalanceException;
 import Ingredient.Drinks.Beer;
+import Ingredient.Drinks.Drinks;
 import Ingredient.Drinks.Juice;
 import Ingredient.SetMeals.SetMeal;
 
@@ -13,21 +14,16 @@ import java.util.Scanner;
 
 public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
     private double RestaurantBalance;       //餐厅账目余额
-    private LinkedList<Beer> BeerList;      //啤酒列表
-    private LinkedList<Juice> JuiceList;    //果汁列表
+    private final LinkedList<Beer> BeerList;      //啤酒列表
+    private final LinkedList<Juice> JuiceList;    //果汁列表
     private final static LinkedList<SetMeal> SetMealList;//套餐列表
 
     //选用LinkedList是因为，在炸鸡店的场景下，可能随时要在商品列表的头、尾、中间插入/删除元素，
     //这种情况下使用基于链表的LinkedList，相较于使用基于动态数组的ArrayList，要更优，
-    //因为在上述操作中，LinkedList只需要改变前后指针的指向，而ArrayList需要移动大量元素，前者在时间复杂度上显然优于后者
+    //因为在上述操作中，LinkedList只需要改变前后指针的指向，而ArrayList需要移动大量元素，前者在时间复杂度上优于后者
 
     //————————————————————构造函数————————————————————//
-    public West2FriedChickenRestaurant(){
-        RestaurantBalance = 0.0;
-        BeerList = new LinkedList<>();
-        JuiceList = new LinkedList<>();
-    }
-    public West2FriedChickenRestaurant( double RestaurantBalance ){
+    public West2FriedChickenRestaurant( double RestaurantBalance ){     //有参
         this.RestaurantBalance = RestaurantBalance;
         BeerList = new LinkedList<>();
         JuiceList = new LinkedList<>();
@@ -50,12 +46,10 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
     //————————————————————取用成分————————————————————//
 
     private void use( Beer UsedBeer ) throws IngredientSortOutException{         //取用啤酒
-        if( BeerList != null ) for( Beer i:BeerList ){
-            if( i.IsOverdue() ) BeerList.remove( i );
-        }   //移除过期产品
+        BeerList.removeIf(Drinks::IsOverdue);       //移除过期产品
 
         boolean FindDrink = false;
-        if( BeerList != null ) for(Beer i:BeerList ){
+        for(Beer i:BeerList ){
             if( i.getName().equals(UsedBeer.getName()) && i.getAlcoholContent() == UsedBeer.getAlcoholContent()){
                 BeerList.remove( i );
                 FindDrink = true;
@@ -66,12 +60,10 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
     }
 
     private void use( Juice UsedJuice ) throws IngredientSortOutException{       //取用果汁
-        if( JuiceList != null ) for( Juice i:JuiceList ){
-            if( i.IsOverdue() ) JuiceList.remove( i );
-        }   //移除过期产品
+        JuiceList.removeIf(Drinks::IsOverdue);      //移除过期产品
 
         boolean FindDrink = false;
-        if( JuiceList != null ) for(Juice i:JuiceList ){
+        for(Juice i:JuiceList ){
             if( i.getName().equals(UsedJuice.getName())){
                 JuiceList.remove( i );
                 FindDrink = true;
@@ -142,122 +134,97 @@ public class West2FriedChickenRestaurant implements FriedChickenRestaurant{
             System.out.println("1. 进货饮料");
             System.out.println("2. 退出进货界面");
             System.out.print("请输入要进行的操作序号: ");
-            switch ( in.nextInt() ){
-                case 1:{
+            switch (in.nextInt()) {
+                case 1 -> {
                     System.out.println("饮料种类选择：");
                     System.out.println("1. 啤酒");
                     System.out.println("2. 果汁");
                     System.out.print("请输入要进货的种类: ");
                     //啤酒：百威、青岛
                     //果汁：橙汁、西瓜汁
-                    switch ( in.nextInt() ){
-                        case 1:{
+                    switch (in.nextInt()) {
+                        case 1 -> {
                             System.out.println("啤酒有以下几类：");
-                            System.out.println("1. 百威( 3.1%vol )");
-                            System.out.println("2. 青岛( 4.0%vol )");
+                            System.out.println("1. 百威( 3.1%vol )  进价: 6.0元");
+                            System.out.println("2. 青岛( 4.0%vol )  进价: 6.0元");
                             System.out.print("请输入要进货的种类、数量: ");
                             int order = in.nextInt(), amount = in.nextInt();
-                            switch ( order ){
-                                case 1:{
-                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
-                                    else{
-                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                            switch (order) {
+                                case 1 -> {
+                                    if (RestaurantBalance >= 6.0 * amount) RestaurantBalance -= 6.0 * amount;
+                                    else {
+                                        throw new OverdraftBalanceException("餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, ");
                                     }
-                                    while( ( amount-- ) >0 ){
+                                    while ((amount--) > 0) {
                                         System.out.print("生产日期(年 月 日): ");
-                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
-                                        BeerList.add( new Beer( "百威", 6.0, ProductionDate, (float) 3.1 ) );
+                                        LocalDate ProductionDate = LocalDate.of(in.nextInt(), in.nextInt(), in.nextInt());
+                                        BeerList.add(new Beer("百威", 6.0, ProductionDate, (float) 3.1));
                                     }
-                                    break;
                                 }
-                                case 2:{
-                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
-                                    else{
-                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                                case 2 -> {
+                                    if (RestaurantBalance >= 6.0 * amount) RestaurantBalance -= 6.0 * amount;
+                                    else {
+                                        throw new OverdraftBalanceException("餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, ");
                                     }
-                                    while( ( amount-- ) >0 ){
+                                    while ((amount--) > 0) {
                                         System.out.print("生产日期(年 月 日): ");
-                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
-                                        BeerList.add( new Beer( "青岛", 6.0, ProductionDate, (float) 4.0 ) );
+                                        LocalDate ProductionDate = LocalDate.of(in.nextInt(), in.nextInt(), in.nextInt());
+                                        BeerList.add(new Beer("青岛", 6.0, ProductionDate, (float) 4.0));
 
                                     }
-                                    break;
                                 }
-                                default:{
-                                    System.out.println("非法输入!");
-                                    break;
-                                }
+                                default -> System.out.println("非法输入!");
                             }
-                            break;
                         }
-                        case 2:{
+                        case 2 -> {
                             System.out.println("果汁有以下几类：");
-                            System.out.println("1. 橙汁");
-                            System.out.println("2. 西瓜汁");
+                            System.out.println("1. 橙汁  进价: 6.0元");
+                            System.out.println("2. 西瓜汁  进价: 6.0元");
                             System.out.print("请输入要进货的种类、数量: ");
                             int order = in.nextInt(), amount = in.nextInt();
-                            switch ( order ){
-                                case 1:{
-                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
-                                    else{
-                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                            switch (order) {
+                                case 1 -> {
+                                    if (RestaurantBalance >= 6.0 * amount) RestaurantBalance -= 6.0 * amount;
+                                    else {
+                                        throw new OverdraftBalanceException("餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, ");
                                     }
-                                    while( ( amount-- ) >0 ){
+                                    while ((amount--) > 0) {
                                         System.out.print("生产日期(年 月 日): ");
-                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
-                                        JuiceList.add( new Juice( "橙汁", 6.0, ProductionDate ) );
+                                        LocalDate ProductionDate = LocalDate.of(in.nextInt(), in.nextInt(), in.nextInt());
+                                        JuiceList.add(new Juice("橙汁", 6.0, ProductionDate));
                                     }
-                                    break;
                                 }
-                                case 2:{
-                                    if( RestaurantBalance >= 6.0 * amount ) RestaurantBalance -= 6.0 * amount;
-                                    else{
-                                        throw new OverdraftBalanceException( "餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, " );
+                                case 2 -> {
+                                    if (RestaurantBalance >= 6.0 * amount) RestaurantBalance -= 6.0 * amount;
+                                    else {
+                                        throw new OverdraftBalanceException("餐厅余额不足, 还缺" + (6.0 * amount - RestaurantBalance) + "元, ");
                                     }
-                                    while( ( amount-- ) >0 ){
+                                    while ((amount--) > 0) {
                                         System.out.print("生产日期(年 月 日): ");
-                                        LocalDate ProductionDate = LocalDate.of( in.nextInt(), in.nextInt(), in.nextInt() );
-                                        JuiceList.add( new Juice( "西瓜汁", 6.0, ProductionDate ) );
+                                        LocalDate ProductionDate = LocalDate.of(in.nextInt(), in.nextInt(), in.nextInt());
+                                        JuiceList.add(new Juice("西瓜汁", 6.0, ProductionDate));
                                     }
-                                    break;
                                 }
-                                default:{
-                                    System.out.println("非法输入!");
-                                    break;
-                                }
+                                default -> System.out.println("非法输入!");
                             }
-                            break;
                         }
-                        default:{
-                            System.out.println("非法输入!");
-                            break;
-                        }
+                        default -> System.out.println("非法输入!");
                     }
-                    break;
                 }
-                case 2:{
+                case 2 -> {
                     return;
                 }
-                default:{
-                    System.out.println("非法输入!");
-                    break;
-                }
+                default -> System.out.println("非法输入!");
             }
 
-
             System.out.print("继续进货请按1, 完成进货请按0: ");
-            switch ( in.nextInt() ){
-                case 0:{
+            switch (in.nextInt()) {
+                case 0 -> {
                     System.out.println("进货完毕!");
                     return;
                 }
-                case 1:{
-                    break;
-                }
-                default:{
-                    System.out.println( "非法输入, 自动返回进货界面!" );
-                    break;
-                }
+                case 1 -> System.out.println("继续进货……");
+                default -> System.out.println("非法输入, 自动返回进货界面!");
             }
         }
 

@@ -4,10 +4,10 @@ import Ingredient.Drinks.Drinks;
 import Ingredient.Drinks.Juice;
 
 public class SetMeal {
-    private String name;
-    private double price;
-    private String FriedChickenName;
-    private Drinks drink;
+    private final String name;
+    private final double price;
+    private final String FriedChickenName;
+    private final Drinks drink;
 
     public SetMeal(){
         this.name = "DefaultName";

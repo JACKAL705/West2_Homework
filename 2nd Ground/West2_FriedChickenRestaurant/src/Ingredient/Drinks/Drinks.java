@@ -1,6 +1,5 @@
 package Ingredient.Drinks;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -25,10 +24,9 @@ public abstract class Drinks {
 
     public abstract String toString();
 
-    public boolean IsOverdue(){
+    public boolean IsOverdue(){     //判断当前是否过期
         long period = ChronoUnit.DAYS.between( ProductionDate, LocalDate.now() );
-        if( period > ShelfLife ) return true;   //超过保质期，变质
-        else return false;
+        return period > ShelfLife;   //超过保质期，变质
     }
 
     public String getName(){
