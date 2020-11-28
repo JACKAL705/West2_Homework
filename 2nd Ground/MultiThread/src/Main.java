@@ -25,28 +25,27 @@ public class Main {
 //    }
     //synchronized很重要，没有它则答案错误（多线程各自持有同一变量的不同副本，导致最后ans每次都输出不同值）
     // 虽然synchronized能使不同线程操作同一个变量，但是同时也会阻塞线程（一个变量在同一时刻只允许一条线程对其操作，即人为把多线程变成单线程）
+    //因此弃用，留作笔记
 
     public static void main( String[] args ) throws Exception{
-        Scanner in = new Scanner( System.in );
+//        Scanner in = new Scanner( System.in );
 //        System.out.print("请输入总查询长度n: "); n = in.nextLong();
 //        System.out.print("请输入分块数量AmountOfSection: "); AmountOfSection = in.nextInt();
 //        System.out.print("请输入要查询的数字x: "); x = in.nextInt();
+        //程序默认设定数值，要更改数值可以在【14~16】行更改，也可以使用【31~34】行输入
 
         long startTime = System.currentTimeMillis();    //获取开始时间
 
-            Thread[] thread = new Thread[AmountOfSection];
-            long[] part_ans = new long[AmountOfSection];
+            Thread[] thread = new Thread[AmountOfSection];      //线程数组
+            long[] part_ans = new long[AmountOfSection];        //答案数组
             long LengthOfSection = n/AmountOfSection;       //分块的长度
             for ( int i = 0; i < AmountOfSection; i++ ){
                 final int NumberOfSection = i;              //分块的序号
-                thread[i] = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        long NowLength = NumberOfSection * LengthOfSection;     //当前分块开始的长度
-                        for ( long j = 0; j < LengthOfSection; j++ ){
-                            if ( contain( (NowLength + j), x ) ) {
-                                part_ans[NumberOfSection] += NowLength + j;     //分块答案（虽然不符合原子性，但是并不影响ans的计算）
-                            }
+                thread[i] = new Thread(() -> {
+                    long NowLength = NumberOfSection * LengthOfSection;     //当前分块开始的长度
+                    for ( long j = 0; j < LengthOfSection; j++ ){           //每次遍历分块长度
+                        if ( contain( (NowLength + j), x ) ) {
+                            part_ans[NumberOfSection] += NowLength + j;     //分块答案（虽然不符合原子性，但是并不影响ans的计算）
                         }
                     }
                 });
