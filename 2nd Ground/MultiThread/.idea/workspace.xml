@@ -43,7 +43,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../Software/JavaSe15/CodeBase/Test" />
   </component>
   <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
@@ -94,10 +94,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="447" y="87" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1605317636236" />
-    <state x="122" y="168" key="FileChooserDialogImpl" timestamp="1606529937976">
+    <state x="122" y="168" key="FileChooserDialogImpl" timestamp="1606533258188">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="122" y="168" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1606529937976" />
+    <state x="122" y="168" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1606533258188" />
     <state width="1493" height="225" key="GridCell.Tab.0.bottom" timestamp="1606533170708">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
